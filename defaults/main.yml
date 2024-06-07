@@ -1,0 +1,71 @@
+### Azure AD App registration related variables ###
+# Azure AD App display name
+# az_app_display_name:
+
+# Who Azure AD App sign in enabled for (single tenant/multutenant, etc.)
+az_app_sing_in_audience: AzureADMyOrg
+
+# (optional) Roles to associate with the application
+# https://docs.ansible.com/ansible/latest/collections/azure/azcollection/azure_rm_adapplication_module.html#parameter-app_roles
+# az_app_roles: {}
+
+# Accept other IDPs or not
+az_app_allow_guest_sign_in: false
+
+# For different Azure environments (AzureCloud, AzureChinaCloud, AzureUSGovernment, etc.)
+az_app_cloud_env: AzureCloud
+
+# (optional) Homepage for the Azure App
+# az_app_homepage: ''
+
+# Space-separated unique URIs that Azure AD can use for this app.
+# az_app_identifier_uris: ''
+
+# Allow implicit oauth2 flow
+az_app_allow_implicit_oauth2: false
+
+# (optional) Optional claims for the application
+# az_app_optional_claims: []
+
+# (optional) The public client redirect urls.
+# Space-separated URIs to which Azure AD will redirect in response to an OAuth 2.0 request.
+# az_app_public_client_reply_urls: ''
+
+# (optional) The spa redirect urls.
+# Space-separated URIs to which Azure AD will redirect in response to an OAuth 2.0 request.
+# az_app_spa_reply_urls: ''
+
+# (optional) The web redirect urls.
+# Space-separated URIs to which Azure AD will redirect in response to an OAuth 2.0 request.
+# az_app_web_reply_urls: ''
+
+# Az Application state
+az_app_state: present
+
+### Azure AD App registration secret related variables ###
+# How many days left on the current secret/secrets will trigger secret rotation, for example:
+# By default if a secret/secrets is expiring in less than 5 days, a new one will be created
+# If there is at least one secret that expires in more than 5 days, it will be considered valid, and no new secret will be created
+# The old secret/secrets will not be deleted until it expires
+az_app_expiring_days: 5
+
+# How many days should the new secret be valid
+az_app_new_password_days_valid: 30
+
+# Save new secret in an Azure KeyVault
+az_app_save_password_in_kv: false
+
+# If az_app_save_password_in_kv is set to false, the variables below can be skipped
+# Key Vault secret name
+# az_app_kv_secret_name: ''
+
+# Key Vault URI
+# az_app_kv_uri: ''
+
+# (Optional) Key Vault secret tags
+# az_app_kv_secret_tags: {}
+
+# (Optional) Key vault secret description
+# Defaults to az_app_display_name + new secret key id
+# az_app_kv_secret_content_type: ''
+

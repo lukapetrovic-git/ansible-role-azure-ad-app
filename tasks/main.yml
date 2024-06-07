@@ -1,0 +1,83 @@
+---
+- name: get Azure AD App info
+  azure.azcollection.azure_rm_adapplication_info:
+    app_display_name: "{{ az_app_display_name }}"
+  register: azure_ad_app_existing
+
+- name: fail if more than one Azure AD App registration is found
+  ansible.builtin.fail:
+    msg: more than 1 Azure App Registration found with the same name, please check.
+  when: azure_ad_app_existing.applications | length > 1
+
+- name: create {{ az_app_display_name }} Azure AD App
+  azure.azcollection.azure_rm_adapplication:
+    display_name: "{{ az_app_display_name }}"
+    sign_in_audience: "{{ az_app_sing_in_audience }}"
+    app_roles: "{{ az_app_roles | default(omit) }}"
+    allow_guests_sign_in: "{{ az_app_allow_guest_sign_in }}"
+    cloud_environment: "{{ az_app_cloud_env }}"
+    homepage: "{{ az_app_homepage | default(omit) }}"
+    identifier_uris: "{{ az_app_identifier_uris | default(omit) }}"
+    oauth2_allow_implicit_flow: "{{ az_app_allow_implicit_oauth2 }}"
+    optional_claims: "{{ az_app_optional_claims | default(omit) }}"
+    public_client_reply_urls: "{{ az_app_public_client_reply_urls | default(omit) }}"
+    spa_reply_urls: "{{ az_app_spa_reply_urls | default(omit) }}"
+    web_reply_urls: "{{ az_app_web_reply_urls | default(omit) }}"
+    state: "{{ az_app_state }}"
+  register: azure_ad_app_new
+  when: azure_ad_app_existing.applications | length == 0
+
+- name: set application id
+  ansible.builtin.set_fact:
+    azure_ad_application_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
+
+- name: get current az app secrets
+  azure.azcollection.azure_rm_adpassword_info:
+    app_id: "{{ azure_ad_application_id }}"
+  register: azure_ad_app_current_pws
+
+- name: get valid az app secrets
+  ansible.builtin.set_fact:
+    az_app_valid_pws: "{{ (az_app_valid_pws | default([], true)) + [item.key_id] }}"
+  loop: "{{ azure_ad_app_current_pws.passwords }}"
+  when:
+    - azure_ad_app_current_pws.passwords | length > 0
+    - (item.end_date | to_datetime("%Y-%m-%dT%H:%M:%S%z") - ansible_date_time.iso8601_micro | to_datetime("%Y-%m-%dT%H:%M:%S.%f%z")).days | int > az_app_expiring_days
+
+- name: get expired az app secrets
+  ansible.builtin.set_fact:
+    az_app_expired_pws: "{{ (az_app_expired_pws | default([], true)) + [item.key_id] }}"
+  loop: "{{ azure_ad_app_current_pws.passwords }}"
+  when:
+    - azure_ad_app_current_pws.passwords | length > 0
+    - (item.end_date | to_datetime("%Y-%m-%dT%H:%M:%S%z") - ansible_date_time.iso8601_micro | to_datetime("%Y-%m-%dT%H:%M:%S.%f%z")).days | int < 0
+
+- name: create new Azure AD App secret
+  azure.azcollection.azure_rm_adpassword:
+    app_id: "{{ azure_ad_application_id }}"
+    state: present
+    display_name: "{{ ansible_date_time.date }}"
+    end_date: "{{ '%Y-%m-%d' | strftime(( ansible_date_time.epoch | int ) + ( 86400 * az_app_new_password_days_valid )) }}"
+  register: az_app_new_password
+  when: (azure_ad_app_current_pws.passwords | length == 0) or (az_app_valid_pws is undefined) or (az_app_valid_pws | length == 0)
+
+- name: remove expired Azure AD App secrets
+  azure.azcollection.azure_rm_adpassword:
+    app_id: "{{ azure_ad_application_id }}"
+    key_id: "{{ item }}"
+    state: absent
+  loop: "{{ az_app_expired_pws }}"
+  when:
+    - az_app_expired_pws is defined
+    - az_app_expired_pws | length > 0
+
+- name: place new secret in KV secret
+  azure_rm_keyvaultsecret:
+    secret_name: "{{ az_app_kv_secret_name }}"
+    secret_value: "{{ az_app_new_password.secret_text }}"
+    keyvault_uri: "{{ az_app_kv_uri }}"
+    tags: "{{ az_app_kv_secret_tags | default(omit) }}"
+    content_type: "{{ az_app_kv_secret_content_type | default(az_app_display_name + ' - ' + az_app_new_password.key_id, true) }}"
+  when:
+    - az_app_save_password_in_kv | bool
+    - az_app_new_password.changed | bool
