@@ -58,6 +58,7 @@
     state: present
     display_name: "{{ ansible_date_time.date }}"
     end_date: "{{ '%Y-%m-%d' | strftime(( ansible_date_time.epoch | int ) + ( 86400 * az_app_new_password_days_valid )) }}"
+  no_log: true
   register: az_app_new_password
   when: (azure_ad_app_current_pws.passwords | length == 0) or (az_app_valid_pws is undefined) or (az_app_valid_pws | length == 0)
 
@@ -78,6 +79,7 @@
     keyvault_uri: "{{ az_app_kv_uri }}"
     tags: "{{ az_app_kv_secret_tags | default(omit) }}"
     content_type: "{{ az_app_kv_secret_content_type | default(az_app_display_name + ' - ' + az_app_new_password.key_id, true) }}"
+  no_log: true
   when:
     - az_app_save_password_in_kv | bool
     - az_app_new_password.changed | bool
