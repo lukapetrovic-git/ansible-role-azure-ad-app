@@ -33,7 +33,7 @@
 
 - block:
   - name: get Azure AD Service Principal info
-    azure.azcollection.azure_rm_adapplication_info:
+    azure.azcollection.azure_rm_adserviceprincipal_info:
       app_id: "{{ azure_ad_application_id }}"
     register: az_sp_existing
 
@@ -43,12 +43,11 @@
       cloud_environment: "{{ az_app_cloud_env }}"
       state: "{{ az_app_sp_state }}"
     register: az_sp_new
-    when:
-    - az_sp_existing.applications | length == 0
+    when: az_sp_existing.applications | length == 0
 
   - name: set Service Principal variable
     ansible.builtin.set_fact:
-      azure_ad_service_principal: "{{ az_sp_existing.applications[0] | default(azure_ad_app_new, true) }}"
+      azure_ad_service_principal: "{{ az_sp_existing.applications[0] | default(az_sp_new, true) }}"
   when: az_app_create_sp | bool
 
 - name: get current az app secrets
