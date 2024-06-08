@@ -29,17 +29,17 @@
 
 - name: set Azure AD Application id
   ansible.builtin.set_fact:
-    azure_ad_application_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
+    az_app_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
 
 - block:
   - name: get Azure AD Service Principal info
     azure.azcollection.azure_rm_adserviceprincipal_info:
-      app_id: "{{ azure_ad_application_id }}"
+      app_id: "{{ az_app_id }}"
     register: az_sp_existing
 
   - name: create {{ az_app_display_name }} Azure AD Service Principal
     azure.azcollection.azure_rm_adserviceprincipal:
-      app_id: "{{ azure_ad_application_id }}"
+      app_id: "{{ az_app_id }}"
       cloud_environment: "{{ az_app_cloud_env }}"
       state: "{{ az_app_sp_state }}"
     register: az_sp_new
@@ -47,12 +47,12 @@
 
   - name: set Service Principal variable
     ansible.builtin.set_fact:
-      azure_ad_service_principal: "{{ az_sp_existing.service_principals[0] | default(az_sp_new, true) }}"
+      az_service_principal: "{{ az_sp_existing.service_principals[0] | default(az_sp_new, true) }}"
   when: az_app_create_sp | bool
 
 - name: get current az app secrets
   azure.azcollection.azure_rm_adpassword_info:
-    app_id: "{{ azure_ad_application_id }}"
+    app_id: "{{ az_app_id }}"
   register: azure_ad_app_current_pws
 
 - name: get valid az app secrets
@@ -73,7 +73,7 @@
 
 - name: create new Azure AD App secret
   azure.azcollection.azure_rm_adpassword:
-    app_id: "{{ azure_ad_application_id }}"
+    app_id: "{{ az_app_id }}"
     state: present
     display_name: "{{ ansible_date_time.date }}"
     end_date: "{{ '%Y-%m-%d' | strftime(( ansible_date_time.epoch | int ) + ( 86400 * az_app_new_password_days_valid )) }}"
@@ -83,7 +83,7 @@
 
 - name: remove expired Azure AD App secrets
   azure.azcollection.azure_rm_adpassword:
-    app_id: "{{ azure_ad_application_id }}"
+    app_id: "{{ az_app_id }}"
     key_id: "{{ item }}"
     state: absent
   loop: "{{ az_app_expired_pws }}"
@@ -103,4 +103,6 @@
     - az_app_save_password_in_kv | bool
     - az_app_new_password.changed | bool
 
-# optionally add RBAC
+- ansible.builtin.include_tasks: tasks/assign_az_rbac_roles.yml.yml
+  loop: "{{ az_app_rbac_roles }}"
+  when: az_app_assign_rbac_roles | bool
