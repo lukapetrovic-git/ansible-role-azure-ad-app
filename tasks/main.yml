@@ -31,6 +31,13 @@
   ansible.builtin.set_fact:
     azure_ad_application_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
 
+- name: create {{ az_app_display_name }} Azure AD Service Principal
+  azure.azcollection.azure_rm_adserviceprincipal:
+    app_id: "{{ azure_ad_application_id }}"
+    cloud_environment: "{{ az_app_cloud_env }}"
+    state: "{{ az_app_sp_state }}"
+  when: az_app_create_sp | bool
+
 - name: get current az app secrets
   azure.azcollection.azure_rm_adpassword_info:
     app_id: "{{ azure_ad_application_id }}"

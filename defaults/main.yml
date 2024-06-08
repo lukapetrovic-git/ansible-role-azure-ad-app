@@ -15,7 +15,7 @@ az_app_allow_guest_sign_in: false
 # For different Azure environments (AzureCloud, AzureChinaCloud, AzureUSGovernment, etc.)
 az_app_cloud_env: AzureCloud
 
-# (optional) Homepage for the Azure App
+# (optional) Homepage for the Azure AD App
 # az_app_homepage: ''
 
 # Space-separated unique URIs that Azure AD can use for this app.
@@ -41,6 +41,12 @@ az_app_allow_implicit_oauth2: false
 
 # Az Application state
 az_app_state: present
+
+# Create a Service Principal associated with the Azure AD App
+az_app_create_sp: true
+
+# Az Application Service Principal state
+az_app_sp_state: present
 
 ### Azure AD App registration secret related variables ###
 # How many days left on the current secret/secrets will trigger secret rotation, for example:
