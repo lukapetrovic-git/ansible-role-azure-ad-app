@@ -43,11 +43,13 @@
     cloud_environment: "{{ az_app_cloud_env }}"
     state: "{{ az_app_sp_state }}"
   register: az_sp_new
-  when: az_app_create_sp | bool
+  when:
+  - az_app_create_sp | bool
+  - az_sp_existing.applications | length == 0
 
-# - name: set Service Principal id
-#   ansible.builtin.set_fact:
-#     azure_ad_application_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
+- name: set Service Principal variable
+  ansible.builtin.set_fact:
+    azure_ad_service_principal: "{{ az_sp_existing.applications[0] | default(azure_ad_app_new, true) }}"
 
 - name: get current az app secrets
   azure.azcollection.azure_rm_adpassword_info:
