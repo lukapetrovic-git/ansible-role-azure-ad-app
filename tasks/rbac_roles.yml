@@ -5,14 +5,7 @@
     scope: /
   register: az_rbac_role_definition
 
-- name: assign RBAC roles to {{ az_service_principal.app_display_name }} Service Principal
-  azure.azcollection.azure_rm_roleassignment:
-    scope: "{{ scp.path }}"
-    assignee_object_id: "{{ az_service_principal.object_id }}"
-    role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
-    state: "{{ scp.state | default('present', true) }}"
-  loop: "{{ item.scopes }}"
+- ansible.builtin.include_tasks: tasks/assign_roles.yml
+  loop: "{{ item.scp }}"
   loop_control:
     loop_var: scp
-  retries: 10
-  delay: 30
