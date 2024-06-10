@@ -1,7 +1,7 @@
 # ansible-role-azure-ad-app
 Ansible role to manage Azure AD App Registrations and associated Service Principals
 
-This role can:
+What the role does:
 - Create an Azure AD App Registration
 - Create an associated Service Principal (optional)
 - Create/Manage client secrets for the Azure AD App Registration (optional):
