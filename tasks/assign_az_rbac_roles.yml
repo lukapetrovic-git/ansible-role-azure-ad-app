@@ -13,3 +13,5 @@
   loop: "{{ item.scopes }}"
   loop_control:
     loop_var: scp
+  retries: 10
+  delay: 30
