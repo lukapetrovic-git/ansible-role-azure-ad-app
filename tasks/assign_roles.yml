@@ -4,10 +4,12 @@
     scope: "{{ scp.path }}"
     assignee: "{{ az_service_principal.object_id }}"
     role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
+  register: az_rbac_role_existing
 
-# - name: assign RBAC roles to {{ az_service_principal.app_display_name }} Service Principal
-#   azure.azcollection.azure_rm_roleassignment:
-#     scope: "{{ scp.path }}"
-#     assignee_object_id: "{{ az_service_principal.object_id }}"
-#     role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
-#     state: "{{ scp.state | default('present', true) }}"
+- name: assign RBAC roles to {{ az_service_principal.app_display_name }} Service Principal
+  azure.azcollection.azure_rm_roleassignment:
+    scope: "{{ scp.path }}"
+    assignee_object_id: "{{ az_service_principal.object_id }}"
+    role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
+    # state: "{{ scp.state | default('present', true) }}"
+  when: az_rbac_role_existing.roleassignments | length > 0
