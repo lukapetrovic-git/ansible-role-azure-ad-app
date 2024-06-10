@@ -1,0 +1,16 @@
+# this check exists because there is a problem with idempotency in azure.azcollection.azure_rm_roleassignment
+# https://github.com/ansible-collections/azure/issues/1137
+# same reason the state: absent does not work in azure.azcollection.azure_rm_roleassignment
+- name: check if RBAC assignment exists
+  azure.azcollection.azure_rm_roleassignment_info:
+    scope: "{{ scp.path }}"
+    assignee: "{{ az_service_principal.object_id }}"
+    role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
+  register: az_rbac_role_existing
+
+- name: assign RBAC roles to {{ az_service_principal.app_display_name }} Service Principal
+  azure.azcollection.azure_rm_roleassignment:
+    scope: "{{ scp.path }}"
+    assignee_object_id: "{{ az_service_principal.object_id }}"
+    role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
+  when: az_rbac_role_existing.roleassignments | length == 0
