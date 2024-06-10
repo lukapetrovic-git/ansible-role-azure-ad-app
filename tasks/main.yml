@@ -103,6 +103,6 @@
     - az_app_save_password_in_kv | bool
     - az_app_new_password.changed | bool
 
-- ansible.builtin.include_tasks: tasks/assign_az_rbac_roles.yml
+- ansible.builtin.include_tasks: tasks/rbac_roles.yml
   loop: "{{ az_app_rbac_roles }}"
   when: az_app_assign_rbac_roles | bool
