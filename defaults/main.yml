@@ -39,16 +39,13 @@ az_app_allow_implicit_oauth2: false
 # Space-separated URIs to which Azure AD will redirect in response to an OAuth 2.0 request.
 # az_app_web_reply_urls: ''
 
-# Az Application state
-az_app_state: present
-
 # Create a Service Principal associated with the Azure AD App
 az_app_create_sp: true
 
-# Az Application Service Principal state
-az_app_sp_state: present
-
 ### Azure AD App registration secret related variables ###
+# Manage Azure App Secrets (create if expiring soon, remove already expired)
+az_app_manage_secrets: true
+
 # How many days left on the current secret/secrets will trigger secret rotation, for example:
 # By default if a secret/secrets is expiring in less than 5 days, a new one will be created
 # If there is at least one secret that expires in more than 5 days, it will be considered valid, and no new secret will be created

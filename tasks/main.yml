@@ -23,7 +23,6 @@
     public_client_reply_urls: "{{ az_app_public_client_reply_urls | default(omit) }}"
     spa_reply_urls: "{{ az_app_spa_reply_urls | default(omit) }}"
     web_reply_urls: "{{ az_app_web_reply_urls | default(omit) }}"
-    state: "{{ az_app_state }}"
   register: azure_ad_app_new
   when: azure_ad_app_existing.applications | length == 0
 
@@ -41,7 +40,6 @@
     azure.azcollection.azure_rm_adserviceprincipal:
       app_id: "{{ az_app_id }}"
       cloud_environment: "{{ az_app_cloud_env }}"
-      state: "{{ az_app_sp_state }}"
     register: az_sp_new
     when: az_sp_existing.service_principals | length == 0
 
@@ -50,46 +48,8 @@
       az_service_principal: "{{ az_sp_existing.service_principals[0] | default(az_sp_new, true) }}"
   when: az_app_create_sp | bool
 
-- name: get current az app secrets
-  azure.azcollection.azure_rm_adpassword_info:
-    app_id: "{{ az_app_id }}"
-  register: azure_ad_app_current_pws
-
-- name: get valid az app secrets
-  ansible.builtin.set_fact:
-    az_app_valid_pws: "{{ (az_app_valid_pws | default([], true)) + [item.key_id] }}"
-  loop: "{{ azure_ad_app_current_pws.passwords }}"
-  when:
-    - azure_ad_app_current_pws.passwords | length > 0
-    - (item.end_date | to_datetime("%Y-%m-%dT%H:%M:%S%z") - ansible_date_time.iso8601_micro | to_datetime("%Y-%m-%dT%H:%M:%S.%f%z")).days | int > az_app_expiring_days
-
-- name: get expired az app secrets
-  ansible.builtin.set_fact:
-    az_app_expired_pws: "{{ (az_app_expired_pws | default([], true)) + [item.key_id] }}"
-  loop: "{{ azure_ad_app_current_pws.passwords }}"
-  when:
-    - azure_ad_app_current_pws.passwords | length > 0
-    - (item.end_date | to_datetime("%Y-%m-%dT%H:%M:%S%z") - ansible_date_time.iso8601_micro | to_datetime("%Y-%m-%dT%H:%M:%S.%f%z")).days | int < 0
-
-- name: create new Azure AD App secret
-  azure.azcollection.azure_rm_adpassword:
-    app_id: "{{ az_app_id }}"
-    state: present
-    display_name: "{{ ansible_date_time.date }}"
-    end_date: "{{ '%Y-%m-%d' | strftime(( ansible_date_time.epoch | int ) + ( 86400 * az_app_new_password_days_valid )) }}"
-  no_log: true
-  register: az_app_new_password
-  when: (azure_ad_app_current_pws.passwords | length == 0) or (az_app_valid_pws is undefined) or (az_app_valid_pws | length == 0)
-
-- name: remove expired Azure AD App secrets
-  azure.azcollection.azure_rm_adpassword:
-    app_id: "{{ az_app_id }}"
-    key_id: "{{ item }}"
-    state: absent
-  loop: "{{ az_app_expired_pws }}"
-  when:
-    - az_app_expired_pws is defined
-    - az_app_expired_pws | length > 0
+- ansible.builtin.include_tasks: tasks/manage_app_secrets.yml
+  when: az_app_manage_secrets | bool
 
 - name: place new secret in KV secret
   azure_rm_keyvaultsecret:
@@ -100,6 +60,7 @@
     content_type: "{{ az_app_kv_secret_content_type | default(az_app_display_name + ' - ' + az_app_new_password.key_id, true) }}"
   no_log: true
   when:
+    - az_app_manage_secrets | bool
     - az_app_save_password_in_kv | bool
     - az_app_new_password.changed | bool
 
