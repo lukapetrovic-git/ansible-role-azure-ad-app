@@ -79,12 +79,15 @@ az_app_save_password_in_kv: false
 az_app_assign_rbac_roles: false
 
 # (Optional) Azure RBAC Roles to assign to App Service Principal
+# az_app_rbac_roles.scopes[].state defaults to present
 # az_app_rbac_roles:
 #   - name: Contributor
 #     scopes:
-#       - subscriptions/xxx-xxx-xxx/resourceGroups/foo
-#       - subscriptions/xxx-xxx-xxx/resourceGroups/bar
+#       - path: subscriptions/xxx-xxx-xxx/resourceGroups/foo
+#         state: present
+#       - path: subscriptions/xxx-xxx-xxx/resourceGroups/bar
+#         state: present
 #   - name: Reader
 #     scopes:
-#       - subscriptions/xxx-xxx-xxx/resourceGroups/foo
-#       - subscriptions/xxx-xxx-xxx/resourceGroups/bar
+#       - path: subscriptions/xxx-xxx-xxx/resourceGroups/foo
+#       - path: subscriptions/xxx-xxx-xxx/resourceGroups/bar

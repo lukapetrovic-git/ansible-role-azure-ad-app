@@ -7,9 +7,10 @@
 
 - name: assign RBAC roles to {{ az_service_principal.app_display_name }} Service Principal
   azure.azcollection.azure_rm_roleassignment:
-    scope: "{{ scp }}"
+    scope: "{{ scp.path }}"
     assignee_object_id: "{{ az_service_principal.object_id }}"
     role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
+    state: "{{ scp.state | default('present', true) }}"
   loop: "{{ item.scopes }}"
   loop_control:
     loop_var: scp
