@@ -1,5 +1,5 @@
 # get current state
-- name: Get role assignments by name
+- name: check if RBAC assignment exists
   azure_rm_roleassignment_info:
     scope: "{{ scp.path }}"
     assignee: "{{ az_service_principal.object_id }}"
@@ -11,5 +11,4 @@
     scope: "{{ scp.path }}"
     assignee_object_id: "{{ az_service_principal.object_id }}"
     role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
-    # state: "{{ scp.state | default('present', true) }}"
   when: az_rbac_role_existing.roleassignments | length == 0
