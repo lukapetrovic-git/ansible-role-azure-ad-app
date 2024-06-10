@@ -6,6 +6,6 @@
   register: az_rbac_role_definition
 
 - ansible.builtin.include_tasks: tasks/assign_roles.yml
-  loop: "{{ item.scp }}"
+  loop: "{{ item.scopes }}"
   loop_control:
     loop_var: scp
