@@ -12,4 +12,4 @@
     assignee_object_id: "{{ az_service_principal.object_id }}"
     role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
     # state: "{{ scp.state | default('present', true) }}"
-  when: az_rbac_role_existing.roleassignments | length > 0
+  when: az_rbac_role_existing.roleassignments | length == 0
