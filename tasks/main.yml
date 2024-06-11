@@ -14,7 +14,7 @@
     az_app_id: "{{ azure_ad_app_existing.applications[0].app_id }}"
   when: azure_ad_app_existing.applications | length == 1
 
-- name: create {{ az_app_display_name }} Azure AD App
+- name: create/update {{ az_app_display_name }} Azure AD App
   azure.azcollection.azure_rm_adapplication:
     display_name: "{{ az_app_display_name }}"
     app_id: "{{ az_app_id | default(omit) }}"

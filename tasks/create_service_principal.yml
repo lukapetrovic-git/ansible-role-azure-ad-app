@@ -9,7 +9,7 @@
     app_id: "{{ az_app_id }}"
     cloud_environment: "{{ az_app_cloud_env }}"
   register: az_sp_new
-  when: az_sp_existing.service_principals | length == 0
+  # when: az_sp_existing.service_principals | length == 0
 
 - name: set Service Principal variable
   ansible.builtin.set_fact:
