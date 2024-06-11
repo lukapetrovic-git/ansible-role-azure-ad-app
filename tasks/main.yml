@@ -30,7 +30,7 @@
   ansible.builtin.set_fact:
     az_app_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
 
-- name: create {{ az_app_display_name }} Azure AD Service Principal
+- name: create/update {{ az_app_display_name }} Azure AD Service Principal
   azure.azcollection.azure_rm_adserviceprincipal:
     app_id: "{{ az_app_id }}"
     cloud_environment: "{{ az_app_cloud_env }}"
