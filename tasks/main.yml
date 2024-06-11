@@ -9,15 +9,10 @@
     msg: more than 1 Azure App Registration found with the same name, please check.
   when: azure_ad_app_existing.applications | length > 1
 
-- name: set existing Azure AD Application id
-  ansible.builtin.set_fact:
-    az_app_id: "{{ azure_ad_app_existing.applications[0].app_id }}"
-  when: azure_ad_app_existing.applications | length == 1
-
 - name: create/update {{ az_app_display_name }} Azure AD App
   azure.azcollection.azure_rm_adapplication:
     display_name: "{{ az_app_display_name }}"
-    app_id: "{{ az_app_id | default(omit) }}"
+    app_id: "{{ azure_ad_app_existing.applications[0].app_id | default(omit) }}"
     sign_in_audience: "{{ az_app_sing_in_audience }}"
     app_roles: "{{ az_app_roles | default(omit) }}"
     allow_guests_sign_in: "{{ az_app_allow_guest_sign_in }}"
@@ -30,7 +25,6 @@
     spa_reply_urls: "{{ az_app_spa_reply_urls | default(omit) }}"
     web_reply_urls: "{{ az_app_web_reply_urls | default(omit) }}"
   register: azure_ad_app_new
-  # when: azure_ad_app_existing.applications | length == 0
 
 - name: set Azure AD Application id
   ansible.builtin.set_fact:
