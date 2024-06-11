@@ -39,6 +39,9 @@ az_app_allow_implicit_oauth2: false
 # Space-separated URIs to which Azure AD will redirect in response to an OAuth 2.0 request.
 # az_app_web_reply_urls: ''
 
+# (optional) Resource scopes and roles the application requires access to.
+# az_app_req_access:
+
 # Create a Service Principal associated with the Azure AD App
 az_app_create_sp: true
 
@@ -74,7 +77,6 @@ az_app_save_password_in_kv: false
 
 # (Optional) Assign Azure RBAC Roles to App Service Principal
 az_app_assign_rbac_roles: false
-
 # (Optional) Azure RBAC Roles to assign to App Service Principal
 # Planning to add scopes[].state, when https://github.com/ansible-collections/azure/issues/1137 gets resolved
 # az_app_rbac_roles:

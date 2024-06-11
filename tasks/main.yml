@@ -24,6 +24,7 @@
     public_client_reply_urls: "{{ az_app_public_client_reply_urls | default(omit) }}"
     spa_reply_urls: "{{ az_app_spa_reply_urls | default(omit) }}"
     web_reply_urls: "{{ az_app_web_reply_urls | default(omit) }}"
+    required_resource_accesses: "{{ az_app_req_access | default(omit) }}"
   register: azure_ad_app_new
 
 - name: set Azure AD Application id
