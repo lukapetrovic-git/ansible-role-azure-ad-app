@@ -1,16 +1,10 @@
 ---
-- name: get Azure AD Service Principal info
-  azure.azcollection.azure_rm_adserviceprincipal_info:
-    app_id: "{{ az_app_id }}"
-  register: az_sp_existing
-
 - name: create {{ az_app_display_name }} Azure AD Service Principal
   azure.azcollection.azure_rm_adserviceprincipal:
     app_id: "{{ az_app_id }}"
     cloud_environment: "{{ az_app_cloud_env }}"
-  register: az_sp_new
-  # when: az_sp_existing.service_principals | length == 0
+  register: az_sp
 
 - name: set Service Principal variable
   ansible.builtin.set_fact:
-    az_service_principal: "{{ az_sp_existing.service_principals[0] | default(az_sp_new, true) }}"
+    az_service_principal: "{{ az_sp }}"
