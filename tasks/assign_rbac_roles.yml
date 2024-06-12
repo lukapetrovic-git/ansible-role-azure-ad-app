@@ -13,4 +13,6 @@
     scope: "{{ scp.path }}"
     assignee_object_id: "{{ az_service_principal.object_id }}"
     role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
+  retries: 10
+  delay: 30
   when: az_rbac_role_existing.roleassignments | length == 0
