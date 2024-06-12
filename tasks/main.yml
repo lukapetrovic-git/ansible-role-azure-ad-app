@@ -31,11 +31,7 @@
   ansible.builtin.set_fact:
     az_app_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
 
-- name: create/update {{ az_app_display_name }} Azure AD Service Principal
-  azure.azcollection.azure_rm_adserviceprincipal:
-    app_id: "{{ az_app_id }}"
-    cloud_environment: "{{ az_app_cloud_env }}"
-  register: az_service_principal
+- ansible.builtin.include_tasks: tasks/manage_service_principal.yml
   when: az_app_create_sp | bool
 
 - ansible.builtin.include_tasks: tasks/manage_app_secrets.yml
