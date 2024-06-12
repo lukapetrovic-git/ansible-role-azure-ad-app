@@ -45,7 +45,7 @@
 
 - name: set Azure AD Service Principal object
   ansible.builtin.set_fact:
-    az_service_principal: "{{ azure_ad_service_principal_existing | default(az_service_principal_new, true) }}"
+    az_service_principal: "{{ azure_ad_service_principal_existing.service_principals[0] | default(az_service_principal_new, true) }}"
 
 - ansible.builtin.include_tasks: tasks/manage_app_secrets.yml
   when: az_app_manage_secrets | bool
