@@ -44,7 +44,7 @@
     keyvault_uri: "{{ az_app_kv_uri }}"
     tags: "{{ az_app_kv_secret_tags | default(omit) }}"
     content_type: "{{ az_app_kv_secret_content_type | default(az_app_display_name + ' - ' + az_app_new_password.key_id, true) }}"
-  no_log: true
+  # no_log: true
   when:
     - az_app_manage_secrets | bool
     - az_app_save_password_in_kv | bool
