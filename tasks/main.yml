@@ -37,6 +37,7 @@
 - ansible.builtin.include_tasks: tasks/manage_app_secrets.yml
   when: az_app_manage_secrets | bool
 
+# is this idempotent, maybe az_app_new_password.changed | bool is overkill
 - name: place new secret in KV secret
   azure_rm_keyvaultsecret:
     secret_name: "{{ az_app_kv_secret_name }}"
