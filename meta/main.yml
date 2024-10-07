@@ -1,23 +1,19 @@
 galaxy_info:
-  role_name: azure_ad_app
-  author: Luka Petrovic
-  # namespace:
+  role_name: azure-ad-app
+  author: lukapetrovic
   description: Ansible role to create Azure AD App Registrations, create/rotate their passwords and optionally save them in an Azure KeyVault.
-
   license: MIT
-
   min_ansible_version: 2.10.0
-
   platforms:
     - name: Ubuntu
       versions:
         - focal
         - jammy
-
+        - noble
   galaxy_tags:
-    - Azure AD
-    - Entra ID
-    - Microsoft
-    - App Registration
+    - cloud
+    - azure
+    - azuread
+    - microsoft
 
 dependencies: []
