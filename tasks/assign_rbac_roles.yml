@@ -9,7 +9,7 @@
     role_definition_id: "{{ az_rbac_role_definition.roledefinitions[0].id }}"
   register: az_rbac_role_existing
 
-- name: assign RBAC roles to Service Principal - {{ az_service_principal.app_display_name }}
+- name: Assign RBAC roles to Service Principal - {{ az_service_principal.app_display_name }}
   azure.azcollection.azure_rm_roleassignment:
     scope: "{{ scp.path }}"
     assignee_object_id: "{{ az_service_principal.object_id }}"
