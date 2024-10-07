@@ -1,3 +1,4 @@
+---
 ### Azure AD App registration related variables ###
 # Azure AD App display name
 # az_app_display_name:

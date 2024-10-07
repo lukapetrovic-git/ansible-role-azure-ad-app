@@ -1,15 +1,15 @@
 ---
-- name: get Azure AD App info
+- name: Get Azure AD App info
   azure.azcollection.azure_rm_adapplication_info:
     app_display_name: "{{ az_app_display_name }}"
   register: azure_ad_app_existing
 
-- name: fail if more than one Azure AD App registration is found
+- name: Fail if more than one Azure AD App registration is found
   ansible.builtin.fail:
     msg: more than 1 Azure App Registration found with the same name, please check.
   when: azure_ad_app_existing.applications | length > 1
 
-- name: create/update {{ az_app_display_name }} Azure AD App
+- name: Create/update Azure AD App - {{ az_app_display_name }}
   azure.azcollection.azure_rm_adapplication:
     display_name: "{{ az_app_display_name }}"
     app_id: "{{ azure_ad_app_existing.applications[0].app_id | default(omit) }}"
@@ -27,18 +27,20 @@
     required_resource_accesses: "{{ az_app_req_access | default(omit) }}"
   register: azure_ad_app_new
 
-- name: set Azure AD Application id
+- name: Set Azure AD Application id
   ansible.builtin.set_fact:
     az_app_id: "{{ azure_ad_app_existing.applications[0].app_id | default(azure_ad_app_new.app_id, true) }}"
 
-- ansible.builtin.include_tasks: tasks/manage_service_principal.yml
+- name: Manage Service Principal
+  ansible.builtin.include_tasks: tasks/manage_service_principal.yml
   when: az_app_create_sp | bool
 
-- ansible.builtin.include_tasks: tasks/manage_app_secrets.yml
+- name: Manage App secrets
+  ansible.builtin.include_tasks: tasks/manage_app_secrets.yml
   when: az_app_manage_secrets | bool
 
-- name: place new secret in KV secret
-  azure_rm_keyvaultsecret:
+- name: Place new secret in KV secret
+  azure.azcollection.azure_rm_keyvaultsecret:
     secret_name: "{{ az_app_kv_secret_name }}"
     secret_value: "{{ az_app_new_password.secret_text }}"
     keyvault_uri: "{{ az_app_kv_uri }}"
@@ -50,6 +52,7 @@
     - az_app_save_password_in_kv | bool
     - az_app_new_password.changed | bool
 
-- ansible.builtin.include_tasks: tasks/add_rbac_roles.yml
+- name: Add RBAC roles
+  ansible.builtin.include_tasks: tasks/add_rbac_roles.yml
   loop: "{{ az_app_rbac_roles }}"
   when: az_app_assign_rbac_roles | bool

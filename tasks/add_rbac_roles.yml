@@ -1,11 +1,12 @@
 ---
-- name: get role definitions id
+- name: Get role definitions id
   azure.azcollection.azure_rm_roledefinition_info:
     role_name: "{{ item.name }}"
     scope: /
   register: az_rbac_role_definition
 
-- ansible.builtin.include_tasks: tasks/assign_rbac_roles.yml
+- name: Assign RBAC roles
+  ansible.builtin.include_tasks: tasks/assign_rbac_roles.yml
   loop: "{{ item.scopes }}"
   loop_control:
     loop_var: scp
