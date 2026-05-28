@@ -50,7 +50,7 @@
   when:
     - az_app_manage_secrets | bool
     - az_app_save_password_in_kv | bool
-    - az_app_new_password.changed | bool
+    - az_app_new_password.changed | bool or az_app_force_kv_save | bool
 
 - name: Add RBAC roles
   ansible.builtin.include_tasks: tasks/add_rbac_roles.yml

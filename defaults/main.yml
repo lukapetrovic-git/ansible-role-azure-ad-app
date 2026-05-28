@@ -62,6 +62,11 @@ az_app_new_password_days_valid: 30
 # Save new secret in an Azure KeyVault
 az_app_save_password_in_kv: false
 
+# Force saving of new secret in an Azure KeyVault
+# Sometimes `azure.azcollection.azure_rm_adpassword` returns ok instead of changed, even when a new secret is created, which causes the new secret to not be saved in Key Vault. 
+# Setting this variable to true will force saving the secret in Key Vault, even if `azure.azcollection.azure_rm_adpassword` returns ok.
+az_app_force_kv_save: false
+
 # If az_app_save_password_in_kv is set to false, the variables below can be skipped
 # Key Vault secret name
 # az_app_kv_secret_name: ''
