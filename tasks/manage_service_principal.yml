@@ -3,12 +3,16 @@
   azure.azcollection.azure_rm_adserviceprincipal_info:
     app_id: "{{ az_app_id }}"
   register: azure_ad_service_principal_existing
+  retries: 10
+  delay: 10
 
 - name: Create/update Azure AD Service Principal - {{ az_app_display_name }}
   azure.azcollection.azure_rm_adserviceprincipal:
     app_id: "{{ az_app_id }}"
     cloud_environment: "{{ az_app_cloud_env }}"
   register: az_service_principal_new
+  retries: 10
+  delay: 10
 
 - name: Set Azure AD Service Principal object
   ansible.builtin.set_fact:
