@@ -60,6 +60,6 @@
 - name: Unset role set_fact variables
   ansible.builtin.set_fact:
     az_app_id: "{{ undef() }}"
-    az_app_valid_pws: "{{ undef() }}"
-    az_app_expired_pws: "{{ undef() }}"
+    az_app_valid_pws: []
+    az_app_expired_pws: []
     az_service_principal: "{{ undef() }}"
