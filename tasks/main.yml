@@ -56,3 +56,10 @@
   ansible.builtin.include_tasks: tasks/add_rbac_roles.yml
   loop: "{{ az_app_rbac_roles }}"
   when: az_app_assign_rbac_roles | bool
+
+- name: Unset role set_fact variables
+  ansible.builtin.set_fact:
+    az_app_id: "{{ undef() }}"
+    az_app_valid_pws: "{{ undef() }}"
+    az_app_expired_pws: "{{ undef() }}"
+    az_service_principal: "{{ undef() }}"
